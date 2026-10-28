@@ -1,0 +1,47 @@
+INTERGUATE - VERSION WEB
+
+ARCHIVOS
+- app.py: aplicación web con Streamlit.
+- requirements.txt: librerías necesarias.
+- .streamlit/secrets.toml.example: ejemplo de configuración del servidor.
+- .gitignore: evita subir credenciales reales.
+
+IMPORTANTE ANTES DE PUBLICAR
+La base de datos original usa SERVER=localhost. Eso funciona solamente desde la computadora donde está instalado SQL Server. La web publicada se ejecuta en otro servidor y NO podrá alcanzar el localhost de tu computadora.
+
+Necesitas alojar SQL Server en un servidor remoto con TCP/IP habilitado y acceso de red protegido, o configurar un servicio de base de datos compatible. No abras el puerto 1433 a todo internet sin controles. Usa una conexión cifrada, contraseñas fuertes y reglas de firewall que limiten el acceso.
+
+PUBLICAR EN STREAMLIT COMMUNITY CLOUD
+1. Descarga y descomprime este ZIP.
+2. Crea una cuenta en https://github.com/ si no tienes una.
+3. En GitHub crea un repositorio nuevo, por ejemplo interguate-web.
+4. Sube app.py, requirements.txt y la carpeta .streamlit con secrets.toml.example. No subas nunca una secrets.toml real con contraseñas.
+5. Entra en https://share.streamlit.io/ e inicia sesión con GitHub.
+6. Pulsa Create app, selecciona el repositorio, rama main y archivo app.py.
+7. Antes de desplegar, abre Advanced settings > Secrets y pega una configuración como esta, sustituyendo el servidor por el nombre/IP real de tu servidor SQL:
+
+[database]
+server = "TU_SERVIDOR_SQL_PUBLICO"
+port = 1433
+name = "AgenciaViajesInterGuate"
+
+8. Pulsa Deploy. Streamlit instalará las librerías de requirements.txt y publicará la página con una dirección .streamlit.app.
+
+CÓMO FUNCIONA EL INICIO DE SESIÓN
+La web solicita el usuario y contraseña de SQL Server y consulta a qué rol pertenece. No coloques las contraseñas de los usuarios dentro de este archivo ni en GitHub.
+
+LIMITACIONES Y SEGURIDAD
+- Esta versión es una adaptación web; no usa CustomTkinter, porque esa librería es para escritorio.
+- El administrador tiene formularios genéricos para agregar, editar y eliminar registros. SQL Server puede rechazar operaciones por restricciones de claves foráneas, reglas CHECK o permisos.
+- Los demás roles ven únicamente los módulos definidos en la interfaz y consultan con sus permisos SQL; las escrituras de agente/cajero deben hacerse con los procedimientos almacenados autorizados, no con CRUD genérico.
+- El rol de cliente no queda limitado automáticamente a sus propias reservaciones solo por ocultar módulos. Para producción se debe implementar y probar un filtro de seguridad en SQL Server o en consultas controladas.
+- Antes de usar datos reales, probar con una copia de la base de datos y usuarios de permisos limitados.
+
+PRUEBA LOCAL
+Instala Python 3.11 o 3.12. Abre una terminal dentro de la carpeta y ejecuta:
+  pip install -r requirements.txt
+
+Crea .streamlit/secrets.toml (copiando el ejemplo y reemplazando los datos del servidor). Luego ejecuta:
+  streamlit run app.py
+
+Para prueba local, el servidor puede ser localhost si SQL Server está en esa misma computadora. Para la web publicada, debe ser un servidor accesible desde internet y correctamente protegido.
